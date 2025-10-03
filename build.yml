@@ -1,0 +1,65 @@
+name: build-apk-and-aab
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install EAS CLI
+        run: npm i -g eas-cli
+      - name: Install deps
+        run: npm install
+      - name: EAS login (optional)
+        if: ${{ secrets.EAS_TOKEN != '' }}
+        run: eas whoami || eas login --token ${{ secrets.EAS_TOKEN }}
+      - name: Build APK (preview profile)
+        run: eas build -p android --profile preview --non-interactive --no-wait --json > build.json
+      - name: Poll build and download
+        run: |
+          BUILD_ID=$(jq -r '.[0].id' build.json)
+          echo "Build ID: $BUILD_ID"
+          eas build:wait --platform android --build-id $BUILD_ID --non-interactive --json > result.json
+          URL=$(jq -r '.artifacts.buildUrl' result.json)
+          echo "APK URL: $URL"
+          curl -L "$URL" -o RadioMBS.apk
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RadioMBS
+          path: RadioMBS.apk
+
+  aab:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install EAS CLI
+        run: npm i -g eas-cli
+      - name: Install deps
+        run: npm install
+      - name: EAS login (optional)
+        if: ${{ secrets.EAS_TOKEN != '' }}
+        run: eas whoami || eas login --token ${{ secrets.EAS_TOKEN }}
+      - name: Build AAB (aab profile)
+        run: eas build -p android --profile aab --non-interactive --no-wait --json > build-aab.json
+      - name: Poll build and download (AAB)
+        run: |
+          BUILD_ID=$(jq -r '.[0].id' build-aab.json)
+          echo "Build ID: $BUILD_ID"
+          eas build:wait --platform android --build-id $BUILD_ID --non-interactive --json > result-aab.json
+          URL=$(jq -r '.artifacts.buildUrl' result-aab.json)
+          echo "AAB URL: $URL"
+          curl -L "$URL" -o RadioMBS.aab
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RadioMBS-AAB
+          path: RadioMBS.aab
