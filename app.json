@@ -1,0 +1,45 @@
+{
+  "expo": {
+    "name": "Radio MyBestseller",
+    "slug": "radio-mybestseller",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/icon-1024.png",
+    "splash": {
+      "image": "./assets/icon-1024.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "ro.mybestseller.radio",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio"
+        ],
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-foreground.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "ro.mybestseller.radio",
+      "versionCode": 2
+    },
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/icon-512.png"
+    },
+    "extra": {
+      "streamUrl": "https://play.radioking.io/radio-mybestseller",
+      "m3uUrl": "https://api.radioking.io/radio/766931/listen.m3u"
+    }
+  }
+}
